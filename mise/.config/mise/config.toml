@@ -1,0 +1,7 @@
+[tools]
+go = "latest"
+node = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = ["node", "python", "ruby", "go"]
+python.uv_venv_auto = "create|source"

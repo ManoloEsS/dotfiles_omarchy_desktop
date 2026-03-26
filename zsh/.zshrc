@@ -86,6 +86,8 @@ plugins=(git gh  command-not-found zsh-syntax-highlighting zsh-autosuggestions z
 
 source $ZSH/oh-my-zsh.sh
 unset AUTO_NOTIFY_THRESHOLD
+
+eval "$(fzf --zsh)"
 # Enable transient prompt
 # User configuration
 
@@ -221,20 +223,22 @@ compdef _tmc tmc
 # source ~/powerlevel10k/powerlevel10k.zsh-theme
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/.local/opt/go/bin
 source $ZSH/custom/themes/powerlevel10k/powerlevel10k.zsh-theme
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # opencode
 export PATH=/home/tlaloch/.opencode/bin:$PATH
 export PATH="$HOME/.cargo/bin:$PATH"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# NVM - disabled in favor of mise
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+eval "$(mise activate zsh)"
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/tlaloch/google-cloud-sdk/path.zsh.inc' ]; then . '/home/tlaloch/google-cloud-sdk/path.zsh.inc'; fi
@@ -244,3 +248,15 @@ if [ -f '/home/tlaloch/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/tla
 
 # Turso
 export PATH="$PATH:/home/tlaloch/.turso"
+
+# SSH agent and key
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)" > /dev/null
+fi
+ssh-add ~/.ssh/id_ed25519 2>/dev/null
+
+. "$HOME/.local/share/../bin/env"
+
+# Added by flyctl installer
+export FLYCTL_INSTALL="/home/tlaloch/.fly"
+export PATH="$FLYCTL_INSTALL/bin:$PATH"
