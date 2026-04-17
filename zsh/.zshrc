@@ -260,3 +260,4 @@ ssh-add ~/.ssh/id_ed25519 2>/dev/null
 # Added by flyctl installer
 export FLYCTL_INSTALL="/home/tlaloch/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
+export PATH=$PATH:$HOME/.local/bin
