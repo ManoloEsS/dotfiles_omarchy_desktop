@@ -21,6 +21,9 @@ config.window_padding = {
 }
 
 -- Font fallback list for missing glyphs:
+config.font = wezterm.font("JetBrainsMono Nerd Font")
+config.font_size = 12.0
+
 config.keys = {
 	{ key = "-", mods = "CTRL", action = wezterm.action.DecreaseFontSize },
 }
