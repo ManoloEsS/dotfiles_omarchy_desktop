@@ -182,6 +182,92 @@ zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 # Aliases
+if [[ "$TERM" == "xterm-kitty" ]]; then
+  ff() { fzf --preview 'case $(file --mime-type -b {}) in image/*) kitty icat --clear --transfer-mode=memory --stdin=no --place=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0 {} ;; *) bat --style=numbers --color=always {} ;; esac' "$@" }
+else
+  ff() { fzf --preview 'bat --style=numbers --color=always {}' "$@" }
+fi
+eff() { ${EDITOR:-nvim} "$(ff)" }
+# Compression
+compress() { tar -czf "${1%/}.tar.gz" "${1%/}"; }
+alias decompress="tar -xzf"
+
+# Write ISO to SD card/USB
+iso2sd() {
+  if (( $# < 1 )); then
+    echo "Usage: iso2sd <input_file> [output_device]"
+    echo "Example: iso2sd ~/Downloads/ubuntu.iso /dev/sda"
+    return 1
+  fi
+  local iso="$1" drive="$2"
+  if [[ -z $drive ]]; then
+    drive=$(lsblk -dpno NAME | grep -E '/dev/sd' | fzf --prompt="Select drive: ") || { echo "No drive selected"; return 1; }
+  fi
+  sudo dd bs=4M status=progress oflag=sync if="$iso" of="$drive"
+  sudo eject "$drive"
+}
+
+# Format drive as exFAT
+format-drive() {
+  if (( $# != 2 )); then
+    echo "Usage: format-drive <device> <name>"
+    echo "Example: format-drive /dev/sda 'My Stuff'"
+    return 1
+  fi
+  echo "WARNING: This will completely erase all data on $1"
+  read -rq"?Are you sure? (y/N): " || { echo; return 1; }
+  echo
+  sudo wipefs -a "$1"
+  sudo dd if=/dev/zero of="$1" bs=1M count=100 status=progress
+  sudo parted -s "$1" mklabel gpt
+  sudo parted -s "$1" mkpart primary 1MiB 100%
+  sudo parted -s "$1" set 1 msftdata on
+  local partition="$([[ $1 == *"nvme"* ]] && echo "${1}p1" || echo "${1}1")"
+  sudo partprobe "$1" || true
+  sudo udevadm settle || true
+  sudo mkfs.exfat -n "$2" "$partition"
+  echo "Drive $1 formatted as exFAT and labeled '$2'."
+}
+
+# SSH port forwarding
+fip() {
+  (( $# < 2 )) && { echo "Usage: fip <host> <port1> [port2] ..."; return 1; }
+  local host="$1"; shift
+  for port in "$@"; do
+    ssh -f -N -L "$port:localhost:$port" "$host" && echo "Forwarding localhost:$port -> $host:$port"
+  done
+}
+dip() {
+  (( $# == 0 )) && { echo "Usage: dip <port1> [port2] ..."; return 1; }
+  for port in "$@"; do
+    pkill -f "ssh.*-L $port:localhost:$port" && echo "Stopped forwarding port $port" || echo "No forwarding on port $port"
+  done
+}
+lip() { pgrep -af "ssh.*-L [0-9]+:localhost:[0-9]+" || echo "No active forwards"; }
+
+# Git worktrees
+unalias ga 2>/dev/null
+ga() {
+  [[ -z "$1" ]] && { echo "Usage: ga <branch>"; return 1; }
+  local branch="$1" base="$(basename "$PWD")" wt_path="../${base}--${branch}"
+  git worktree add -b "$branch" "$wt_path"
+  mise trust "$wt_path"
+  cd "$wt_path"
+}
+unalias gd 2>/dev/null
+gd() {
+  if gum confirm "Remove worktree and branch?"; then
+    local cwd="$(pwd)" worktree="$(basename "$cwd")" root branch
+    root="${worktree%%--*}"
+    branch="${worktree#*--}"
+    if [[ "$root" != "$worktree" ]]; then
+      cd "../$root"
+      git worktree remove "$cwd" --force || return 1
+      git branch -D "$branch"
+    fi
+  fi
+}
+
 alias ls='lsd'
 alias vim='nvim'
 alias c='clear'
@@ -190,7 +276,11 @@ alias lazyvim='~/.local/bin/lazyvim'
 # Shell integrations
 
 
-export PATH="$HOME/.local/bin:$PATH"
+export OMARCHY_PATH=$HOME/.local/share/omarchy
+export PATH=$OMARCHY_PATH/bin:$HOME/.local/bin:$PATH
+export BAT_THEME=ansi
+export MANROFFOPT="-c"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 # Lines configured by zsh-newuser-install
