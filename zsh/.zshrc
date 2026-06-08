@@ -351,3 +351,6 @@ ssh-add ~/.ssh/id_ed25519 2>/dev/null
 export FLYCTL_INSTALL="/home/tlaloch/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
 export PATH=$PATH:$HOME/.local/bin
+
+# bun completions
+[ -s "/home/tlaloch/.bun/_bun" ] && source "/home/tlaloch/.bun/_bun"

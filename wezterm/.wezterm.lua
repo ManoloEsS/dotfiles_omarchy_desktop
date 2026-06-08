@@ -27,6 +27,6 @@ config.font_size = 12.0
 config.keys = {
 	{ key = "-", mods = "CTRL", action = wezterm.action.DecreaseFontSize },
 }
-term = "xterm-256color"
+config.term = "xterm-256color"
 -- and finally, return the configuration to wezterm
 return config
