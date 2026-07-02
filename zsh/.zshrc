@@ -13,6 +13,8 @@ fi
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
+export PATH="$HOME/.emacs.d/bin:$PATH"
+
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 export EDITOR=nvim
@@ -354,3 +356,4 @@ export PATH=$PATH:$HOME/.local/bin
 
 # bun completions
 [ -s "/home/tlaloch/.bun/_bun" ] && source "/home/tlaloch/.bun/_bun"
+alias eb="~/eb-venv/bin/eb"
