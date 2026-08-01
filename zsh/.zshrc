@@ -1,3 +1,11 @@
+# If TERM is dumb (TRAMP/automated connections), skip all interactive setup
+if [[ "$TERM" == dumb ]]; then
+  unset zle_bracketed_paste
+  unset zle
+  PS1='$ '
+  return
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -84,7 +92,7 @@ export VISUAL=nvim
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git gh  command-not-found zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf-tab vi-mode)
+plugins=(git gh  command-not-found zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf-tab vi-mode jj)
 
 source $ZSH/oh-my-zsh.sh
 unset AUTO_NOTIFY_THRESHOLD

@@ -2,8 +2,8 @@
 bun = "latest"
 go = "1.26.1"
 node = "latest"
+python = "latest"
 ruff = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node", "python", "ruby", "go"]
-python.uv_venv_auto = "create|source"
